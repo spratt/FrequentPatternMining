@@ -19,5 +19,10 @@ The following datasets were retrieved from the FIMI dataset repository
   - pumsb.dat
   - pumsb_star.dat
 
-References:
-[1]: http://fimi.ua.ac.be/data/
+Resources used:
+ - [1]: http://fimi.ua.ac.be/data/
+ - http://www.borgelt.net/teach/fpm/slides.html
+ - Frequent pattern mining: current status and future directions, 
+   Jiawei Han and Hong Cheng and Dong Xin and Xifeng Yan, 2007.
+ - Data Mining: Concepts and Techniques (Second Ed.)
+   Jiawei Han, 2006.
