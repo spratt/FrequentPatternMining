@@ -17,6 +17,9 @@ class Dataset(object):
     def __len__(self):
         return len(self.rows)
 
+    def __iter__(self):
+        return iter(self.rows)
+
     def readFromFile(self,f):
         for line in f:
             canonical = line.strip().lower()
