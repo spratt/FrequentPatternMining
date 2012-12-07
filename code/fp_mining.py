@@ -1,6 +1,6 @@
 #!/usr/bin/env python2.6
 ######################################################################
-# frequent_pattern_dataset.py
+# fp_mining.py
 ######################################################################
 # In which we implement frequent pattern mining algorithms on a
 # dataset.
@@ -11,15 +11,14 @@
 
 from dataset import Dataset
 
-class FrequentPatternDataset(Dataset):
-    def aprioriPatterns(self,k):
-        pass
+def aprioriPatterns(ds,k):
+    pass
 
-    def fpGrowthPatterns(self,k):
-        pass
+def fpGrowthPatterns(ds,k):
+    pass
 
-    def eclatPatterns(self,k):
-        pass
+def eclatPatterns(ds,k):
+    pass
 
 ######################################################################
 # Basic Tests
@@ -33,11 +32,11 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     filename = sys.argv[1]
-    ds = FrequentPatternDataset()
+    ds = Dataset()
     with open(filename,'rU') as f:
         ds.readFromFile(f)
         
     print "Read {0} lines in {1}".format(len(ds),filename)
-    print ds.aprioriPatterns(5)
-    print ds.fpGrowthPatterns(5)
-    print ds.eclatPatterns(5)
+    print aprioriPatterns(ds,5)
+    print fpGrowthPatterns(ds,5)
+    print eclatPatterns(ds,5)
