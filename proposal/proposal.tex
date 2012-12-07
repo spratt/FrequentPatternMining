@@ -1,0 +1,149 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% COMP 4106
+% November 7th, 2012
+% Project Proposal
+% By Simon Pratt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt]{article}
+
+\usepackage{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1.5in,lmargin=.5in,rmargin=.5in}
+\usepackage[pdftex]{graphicx}
+\usepackage{fancyhdr}
+\usepackage{fix-cm}
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{newclude} % \include without \clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Extra stuff from John Howat
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\implies}{\rightarrow}
+\newcommand{\same}{\leftrightarrow}
+\newcommand{\AND}{\wedge}
+\newcommand{\OR}{\vee}
+\newcommand{\cross}{\times}
+\newcommand{\xor}{\oplus}
+\newcommand{\zz}{\mathbb{Z}}
+\newcommand{\solution}[1]{\ifthenelse{\boolean{solutions}}{\textbf{Solution:} #1}{}}
+\newcommand{\BigOh}[1]{O\!\left(#1\right)}
+\newcommand{\LittleOh}[1]{o\!\left(#1\right)}
+\newcommand{\BigOmega}[1]{\Omega\!\left(#1\right)}
+\newcommand{\LittleOmega}[1]{\omega\!\left(#1\right)}
+\newcommand{\BigTheta}[1]{\Theta\!\left(#1\right)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question and Answer environments
+% modified from Michiel Smid's code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcounter{problem}
+\newcounter{problempart}
+
+\newcommand{\newProblem}[0]{\stepcounter{problem}{\bf Problem \arabic{problem}}\setcounter{problempart}{0}}
+\newcommand{\newPart}[1]{\stepcounter{problempart}{\bf \arabic{problempart}. #1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Theorem, Lemma and Definitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newtheorem*{bthm}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fix for amsthm and parskip
+% URL: http://tex.stackexchange.com/questions/22119/how-can-i-change-the-spacing-before-theorems-with-amsthm
+% From Greg Bint
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=\parskip \thm@postskip=0pt
+}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header/footer
+% Mostly taken from: 
+%  https://texblog.wordpress.com/2007/11/07/headerfooter-in-latex-with-fancyhdr/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\fancyhead{}             % clear header
+\fancyfoot{}
+
+\fancyhead[L]{COMP4106 - Project Proposal}
+\fancyhead[C]{Page \thepage}
+\fancyhead[R]{Simon Pratt - 100663987}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\begin{multicols}{2}
+
+\section*{Project Proposal}
+
+\subsection*{Description of the Problem Domain}
+
+The problem domain is to find frequent patterns in large data sets.
+
+\subsection*{Motivation}
+
+Frequent patterns in data can give us insight into the semantic
+meaning of the data.  In particular, if we are mining for frequent
+patterns in a data set of actions we can identify typical workflow and
+anomalous activity, which could be useful for security or process
+optimization.
+
+\subsection*{AI Techniques to be Used}
+
+Techniques of frequent pattern mining I would like to consider
+include: \texttt{Apriori}, \texttt{FP-growth}, and \texttt{Eclat}
+\cite{Han2007,fpmlecture}.
+
+\subsection*{Proposal}
+
+To implement the aforementioned techniques and run them against
+\emph{Github}'s data set of actions which has recently been made
+public \cite{gharchive}.  This should identify frequent patterns of
+events in \emph{Github}'s usage.  The event types in the data are:
+
+\begin{enumerate}
+\item CommitCommentEvent
+\item CreateEvent
+\item DeleteEvent
+\item DownloadEvent
+\item FollowEvent
+\item ForkEvent
+\item ForkApplyEvent
+\item GistEvent
+\item GollumEvent
+\item IssueCommentEvent
+\item IssuesEvent
+\item MemberEvent
+\item PublicEvent
+\item PullRequestEvent
+\item PullRequestReviewCommentEvent
+\item PushEvent
+\item TeamAddEvent
+\item WatchEvent
+\end{enumerate}
+
+Patterns of usage among these events should provide some information
+about the typical workflow for a social code repository such as
+\emph{Github}.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{multicols}
+\end{document}
