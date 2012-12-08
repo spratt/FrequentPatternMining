@@ -9,7 +9,16 @@
 # For copyright information, see COPYRIGHT file
 ######################################################################
 
-from dataset import Dataset
+from dataset import Dataset, NumericalDataset
+import logging as log
+
+######################################################################
+# Configuration
+######################################################################
+
+name = 'fp_mining'
+format = '[%(asctime)s %(funcName)s]: %(message)s'.format(name)
+log.basicConfig(filename=name+'_log.txt',level=log.INFO,format=format)
 
 ######################################################################
 # Apriori
@@ -27,37 +36,71 @@ def countItems(row):
 
 def countCandidates(row,cands):
     counts = dict()
+    itemset = set(row)
     for cand in cands:
-        counts[str(cand)] = 0
-    
+        candSet = set(cand)
+        counts[str(cand)] = 1 if candSet <= itemset else 0
+    return counts
 
-def aprioriCandidatePatterns(ds,min_sup,prevCands):
+def mergeCounts(counts1,counts2):
+    """ Takes two count dicts and returns the dict merge of both """
+    merge = dict()
+    for key in counts1.keys() + counts2.keys():
+        merge[key] = 0
+        if key in counts1:
+            merge[key] += counts1[key]
+        if key in counts2:
+            merge[key] += counts2[key]
+    return merge
+
+def sort(l):
+    m = l[:]
+    m.sort()
+    return m
+
+def aprioriCandidatePatterns(ds,min_sup,prevCands=None):
     """ given dataset ds, min_sup, and prevCands, find next candidates """
+    log.info('called')
     if len(prevCands) == 0:
         return []
+    if prevCands == None:
+        prevCands = [[]]
     k = len(prevCands[0]) + 1
     items = map(lambda x: [x],set(reduce(lambda x,y: x+y, prevCands)))
     cands = []
     for prevCand in prevCands:
         for item in items:
-            cands.append(prevCand + item)
-            
+            if item[0] not in prevCand:
+                cands.append(prevCand + item)
+    log.info('generated {0} k={1} candidates'.format(len(cands),k))
+    cands = list(set(map(lambda x: str(sort(x)),cands)))
+    cands = map(lambda x: eval(x),cands)
+    log.info('generated {0} k={1} canonical candidates'.format(len(cands),k))
+    counts = dict()
+    for row in ds:
+        rowCounts = countCandidates(row,cands)
+        counts = mergeCounts(counts,rowCounts)
+    log.info('counted candidate pattern occurrences')
+    keys = counts.keys()
+    keys = filter(lambda x: counts[x] > min_sup,keys)
+    candidates = map(lambda x: eval(x),keys)
+    log.info('found {0} k={1} patterns'.format(len(candidates),k))
+    return candidates
 
 def aprioriPatterns(ds,k,min_sup=0):
     """ given dataset ds, find frequent k-patterns with min support min_sup """
+    log.info('called')
     counts = dict()
     for row in ds:
         rowCounts = countItems(row)
-        for item in rowCounts.keys():
-            if item in counts:
-                counts[item] += rowCounts[item]
-            else:
-                counts[item] = rowCounts[item]
+        counts = mergeCounts(counts,rowCounts)
     keys = counts.keys()
     keys = filter(lambda x: counts[x] > min_sup,keys)
     candidates = map(lambda x: [x], keys)
+    log.info('generated {0} k=1 candidates'.format(len(candidates)))
     for i in range(1,k):
         candidates = aprioriCandidatePatterns(ds,min_sup,candidates)
+    log.info('found {0} k={1} patterns'.format(len(candidates),k))
     return candidates
         
 
@@ -87,14 +130,10 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     filename = sys.argv[1]
-    ds = Dataset()
+    ds = NumericalDataset()
     with open(filename,'rU') as f:
         ds.readFromFile(f)
         
     print "Read {0} lines in {1}".format(len(ds),filename)
-    print aprioriPatterns(ds,1)
-    print aprioriPatterns(ds,1,1000)
-    print aprioriPatterns(ds,1,2000)
-    print aprioriPatterns(ds,1,3000)
-    print fpGrowthPatterns(ds,5)
-    print eclatPatterns(ds,5)
+    print aprioriPatterns(ds,5,len(ds)/2)
+
