@@ -25,6 +25,14 @@ class Dataset(object):
             canonical = line.strip().lower()
             self.rows.append(canonical.split(" "))
 
+class NumericalDataset(Dataset):
+    def readFromFile(self,f):
+        Dataset.readFromFile(self,f)
+        for row in range(len(self.rows)):
+            for col in range(len(self.rows[row])):
+                val = self.rows[row][col]
+                self.rows[row][col] = int(val)
+
 ######################################################################
 # Basic Tests
 ######################################################################
