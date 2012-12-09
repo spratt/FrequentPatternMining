@@ -23,6 +23,13 @@ log.basicConfig(filename=name+'_log.txt',level=log.INFO,format=format)
 ######################################################################
 # Apriori
 ######################################################################
+# This algorithm is based on the antimonotone property of frequent
+# itemsets.  That is to say, subsets of frequent itemsets must
+# themselves be frequent itemsets.  With this in mind, to find
+# frequent itemsets of size k, we begin by finding all frequent
+# itemsets of size 1, then of size 2, ..., then of size k-1, then
+# finally we can find the frequent itemsets of size k.
+######################################################################
 
 def countItems(row):
     """ counts items in a row (list), returns a dict(item -> count) """
@@ -102,14 +109,58 @@ def aprioriPatterns(ds,k,min_sup=0):
         candidates = aprioriCandidatePatterns(ds,min_sup,candidates)
     log.info('found {0} k={1} patterns'.format(len(candidates),k))
     return candidates
-        
+
+def testApriori(ds):
+    print aprioriPatterns(ds,5,len(ds)/2)
 
 ######################################################################
 # FP-Growth
 ######################################################################
+# First we build a structure of information about frequent items
+# called the FP-Tree, then we use this structure to find frequent
+# patterns using the FP-Growth algorithm.
+######################################################################
 
-def fpGrowthPatterns(ds,k):
-    pass
+def buildFPTree(ds):
+    log.info('called on ds with {0} elements'.format(len(ds)))
+
+    log.info('counting elements')
+    counts = dict()
+    for row in ds:
+        rowCounts = countItems(row)
+        counts = mergeCounts(counts,rowCounts)
+    log.info('counted {0} elements'.format(len(counts)))
+
+    log.info('transforming dictionary into sorted tuples')
+    countTuples = []
+    for key in counts.keys():
+        countTuples.append((key,counts[key]))
+    countTuples = sorted(countTuples, key = lambda x: x[1], reverse=True)
+    for t in countTuples:
+        log.info('Found tuple {0}'.format(t))
+    log.info('transformed')
+        
+    return countTuples
+
+def mineFPTree(fptree,k,min_sup):
+    log.info('called')
+    return []
+
+def fpGrowthPatterns(ds,k,min_sup=0):
+    log.info('called on ds with {0} elements'.format(len(ds)))
+    
+    log.info('building FP-Tree')
+    fptree = buildFPTree(ds)
+    log.info('FP-Tree built')
+
+    log.info('running FP-Growth on FP-Tree')
+    patterns = mineFPTree(ds,k,min_sup)
+    log.info('FP-Growth found {0} patterns'.format(len(patterns)))
+
+    return patterns
+
+def testFPGrowth(ds):
+    print fpGrowthPatterns(ds,5,len(ds)/2)
 
 ######################################################################
 # Eclat
@@ -133,7 +184,8 @@ if __name__ == '__main__':
     ds = NumericalDataset()
     with open(filename,'rU') as f:
         ds.readFromFile(f)
-        
     print "Read {0} lines in {1}".format(len(ds),filename)
-    print aprioriPatterns(ds,5,len(ds)/2)
 
+    # run test here
+    #testApriori(ds)
+    testFPGrowth(ds)
