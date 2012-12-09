@@ -121,7 +121,48 @@ def testApriori(ds):
 # patterns using the FP-Growth algorithm.
 ######################################################################
 
-def buildFPTree(ds):
+class FPTreeNode(object):
+    def __init__(self,item,count):
+        self.item = item
+        self.count = count
+        self.children = []
+
+    def addChild(self,node):
+        self.children.append(node)
+
+    def incCount(self):
+        self.count += 1
+    
+class FPTree(object):
+    def __init__(self):
+        self.root = FPTreeNode(None,0)
+
+    def addItemset(node,itemset):
+        for item in itemset:
+            child = FPTreeNode(item,1)
+            node.addChild(child)
+            node = child
+
+    def updateItemset(self,itemset):
+        """ takes a list of items, adds or updates a path in tree """
+
+        node = self.root
+        for (i,item) in iterate(itemset):
+            # loop invariant: node is a valid FPTreeNode
+            children = node.children
+            last = node
+            node = None
+            for child in children:
+                if child.item == item:
+                    node = child
+                    break
+            if node == None:
+                FPTree.addItemset(last,itemset[i:])
+                return
+            else:
+                child.incCount()
+    
+def buildFPTree(ds,min_sup):
     log.info('called on ds with {0} elements'.format(len(ds)))
 
     log.info('counting elements')
@@ -135,12 +176,21 @@ def buildFPTree(ds):
     countTuples = []
     for key in counts.keys():
         countTuples.append((key,counts[key]))
+    log.info('transformed {0} tuples'.format(len(countTuples)))
+
+    log.info('filtering for those with more than the minimum support frequency')
+    countTuples = filter(lambda x: x[1] > min_sup,countTuples)
+    log.info('{0} remaining tuples after filtration'.format(len(countTuples)))
+
+    log.info('sorting tuples by support frequency')
     countTuples = sorted(countTuples, key = lambda x: x[1], reverse=True)
-    for t in countTuples:
-        log.info('Found tuple {0}'.format(t))
-    log.info('transformed')
+
+    fptree = FPTree()
+    for row in ds:
         
-    return countTuples
+        #fptree.update
+        pass
+    return fptree
 
 def mineFPTree(fptree,k,min_sup):
     log.info('called')
@@ -150,7 +200,7 @@ def fpGrowthPatterns(ds,k,min_sup=0):
     log.info('called on ds with {0} elements'.format(len(ds)))
     
     log.info('building FP-Tree')
-    fptree = buildFPTree(ds)
+    fptree = buildFPTree(ds,min_sup)
     log.info('FP-Tree built')
 
     log.info('running FP-Growth on FP-Tree')
