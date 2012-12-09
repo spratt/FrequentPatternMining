@@ -136,13 +136,12 @@ class FPTreeNode(object):
         self.count += count
 
     def prefixPath(self):
-        path = []
+        path = deque()
         node = self.parent
-        while node != None and node.item != None:
-            path.append(node.item)
+        while node.item != None:
+            path.appendleft(node.item)
             node = node.parent
-        path.reverse()
-        return path
+        return list(path)
 
     def gvNodeLabel(self):
         return '{0} [label="({1}:{2})"];\n'.\
@@ -182,8 +181,9 @@ class FPTree(object):
 
     def addItemset(self,node,itemset):
         for item in itemset:
+            # loop invariant: node is the child's parent
             child = FPTreeNode(item,1,node)
-            self.registerNode(item,node)
+            self.registerNode(item,child)
             self.incItemCount(item)
             node.addChild(child)
             node = child
@@ -336,5 +336,5 @@ if __name__ == '__main__':
 
     # run test here
     #testApriori(ds)
-    #testFPGrowth(ds)
-    testFPTree(ds)
+    #testFPTree(ds)
+    testFPGrowth(ds)
