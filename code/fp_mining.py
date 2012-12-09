@@ -221,7 +221,7 @@ class FPTree(object):
         """ takes a list of items, adds or updates a path in tree """
 
         node = self.root
-        node.incCount(len(itemset))
+        node.incCount()
         for (i,item) in enumerate(itemset):
             # loop invariant: node is a valid FPTreeNode
             children = node.children
