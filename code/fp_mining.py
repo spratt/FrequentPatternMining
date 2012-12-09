@@ -9,8 +9,9 @@
 # For copyright information, see COPYRIGHT file
 ######################################################################
 
-from dataset import Dataset, NumericalDataset
+from collections import deque
 import logging as log
+from dataset import Dataset, NumericalDataset
 
 ######################################################################
 # Configuration
@@ -89,7 +90,7 @@ def aprioriCandidatePatterns(ds,min_sup,prevCands=None):
         counts = mergeCounts(counts,rowCounts)
     log.info('counted candidate pattern occurrences')
     keys = counts.keys()
-    keys = filter(lambda x: counts[x] > min_sup,keys)
+    keys = filter(lambda x: counts[x] >= min_sup,keys)
     candidates = map(lambda x: eval(x),keys)
     log.info('found {0} k={1} patterns'.format(len(candidates),k))
     return candidates
@@ -102,7 +103,7 @@ def aprioriPatterns(ds,k,min_sup=0):
         rowCounts = countItems(row)
         counts = mergeCounts(counts,rowCounts)
     keys = counts.keys()
-    keys = filter(lambda x: counts[x] > min_sup,keys)
+    keys = filter(lambda x: counts[x] >= min_sup,keys)
     candidates = map(lambda x: [x], keys)
     log.info('generated {0} k=1 candidates'.format(len(candidates)))
     for i in range(1,k):
@@ -133,12 +134,51 @@ class FPTreeNode(object):
 
     def incCount(self,count=1):
         self.count += count
+
+    def prefixPath(self):
+        path = []
+        node = self.parent
+        while node != None and node.item != None:
+            path.append(node.item)
+            node = node.parent
+        path.reverse()
+        return path
+
+    def gvNodeLabel(self):
+        return '{0} [label="({1}:{2})"];\n'.\
+            format(self.gvNodeName(),self.item,self.count)
+
+    def gvNodeName(self):
+        return 'fp_node_{0}'.format(str(id(self)))
     
 class FPTree(object):
     def __init__(self):
         self.root = FPTreeNode(None,0)
         self.itemCounts = dict()
         self.itemNodes = dict()
+
+    def __str__(self):
+        return self.gvString()
+
+    def gvString(self):
+        s = "digraph{\n"
+        d = deque([self.root])
+        while len(d) > 0:
+            node = d.popleft()
+            d.extend(node.children)
+            s += node.gvNodeLabel()
+            for child in node.children:
+                s += '{0} -> {1};\n'.\
+                    format(node.gvNodeName(),child.gvNodeName())
+        return s + "}\n"
+
+    def isSinglePath(self):
+        node=self.root
+        while len(node.children) > 0:
+            if len(node.children) > 1:
+                return False
+            node = node.children[0]
+        return True
 
     def addItemset(self,node,itemset):
         for item in itemset:
@@ -162,6 +202,21 @@ class FPTree(object):
         else:
             itemNodes[item] = [node]
 
+    def getConditionalPatternBase(self,item):
+        base = []
+        itemNodes = self.itemNodes
+        if item not in itemNodes:
+            return base
+        for node in itemNodes[item]:
+            prefixPath = node.prefixPath()
+            if len(prefixPath) == 0:
+                continue
+            log.info('found {0} times prefixPath:{1}'.\
+                         format(node.count,prefixPath))
+            for _ in range(node.count):
+                base.append(prefixPath)
+        return base
+
     def updateItemset(self,itemset):
         """ takes a list of items, adds or updates a path in tree """
 
@@ -183,8 +238,8 @@ class FPTree(object):
                 node.incCount()
                 self.incItemCount(item)
 
-def sortByFreq(l,counts):
-    return sorted(l,key=lambda x: counts[x],reverse=True)
+def sortByFreq(l,counts,reverse=True):
+    return sorted(l,key=lambda x: counts[x],reverse=reverse)
     
 def buildFPTree(ds,min_sup):
     log.info('called on ds with {0} elements'.format(len(ds)))
@@ -197,7 +252,7 @@ def buildFPTree(ds,min_sup):
     log.info('counted {0} elements'.format(len(counts)))
 
     log.info('finding the frequent elements')
-    freqElmnts = set(filter(lambda x: counts[x] > min_sup,counts.keys()))
+    freqElmnts = set(filter(lambda x: counts[x] >= min_sup,counts.keys()))
     log.info('found {0} frequent elements'.format(len(freqElmnts)))
 
     log.info('building FP-Tree')
@@ -208,12 +263,30 @@ def buildFPTree(ds,min_sup):
         fptree.updateItemset(freqItems)
     log.info('built FP-Tree with {0} nodes'.format(fptree.root.count))
     log.info('root node has {0} children'.format(len(fptree.root.children)))
+    log.info('FP-Tree is a single path? {0}'.format(fptree.isSinglePath()))
     return fptree
 
 def mineFPTree(fptree,k,min_sup):
     log.info('called')
     patterns = []
-    # use FP-Tree to find patterns
+
+    log.info('building item list sorted by frequency ascending')
+    counts = fptree.itemCounts
+    items = counts.keys()
+    items = sortByFreq(items,counts,False)
+    log.info('found {0} items'.format(len(items)))
+    log.info('first item: {0}, frequency: {1}'.\
+                 format(items[0],counts[items[0]]))
+
+    for item in items:
+        cpb = fptree.getConditionalPatternBase(item)
+        log.info('conditional pattern base for {0} has {1} rows'.\
+                     format(item,len(cpb)))
+    
+        #log.info('generating conditional FP-Tree')
+    
+        #log.info('generating frequent patterns')
+    
     return patterns
 
 def fpGrowthPatterns(ds,k,min_sup=0):
@@ -224,10 +297,13 @@ def fpGrowthPatterns(ds,k,min_sup=0):
     log.info('FP-Tree built')
 
     log.info('running FP-Growth on FP-Tree')
-    patterns = mineFPTree(ds,k,min_sup)
+    patterns = mineFPTree(fptree,k,min_sup)
     log.info('FP-Growth found {0} patterns'.format(len(patterns)))
 
     return patterns
+
+def testFPTree(ds):
+    print buildFPTree(ds,len(ds)/2)
 
 def testFPGrowth(ds):
     print fpGrowthPatterns(ds,5,len(ds)/2)
@@ -254,8 +330,11 @@ if __name__ == '__main__':
     ds = NumericalDataset()
     with open(filename,'rU') as f:
         ds.readFromFile(f)
-    print "Read {0} lines in {1}".format(len(ds),filename)
+
+    log.info('==================== fp_mining tests ====================')
+    log.info("Read {0} lines in {1}".format(len(ds),filename))
 
     # run test here
     #testApriori(ds)
-    testFPGrowth(ds)
+    #testFPGrowth(ds)
+    testFPTree(ds)
