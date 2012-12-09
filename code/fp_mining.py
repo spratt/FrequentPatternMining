@@ -122,32 +122,52 @@ def testApriori(ds):
 ######################################################################
 
 class FPTreeNode(object):
-    def __init__(self,item,count):
+    def __init__(self,item,count,parent=None):
         self.item = item
         self.count = count
+        self.parent = parent
         self.children = []
 
     def addChild(self,node):
         self.children.append(node)
 
-    def incCount(self):
-        self.count += 1
+    def incCount(self,count=1):
+        self.count += count
     
 class FPTree(object):
     def __init__(self):
         self.root = FPTreeNode(None,0)
+        self.itemCounts = dict()
+        self.itemNodes = dict()
 
-    def addItemset(node,itemset):
+    def addItemset(self,node,itemset):
         for item in itemset:
-            child = FPTreeNode(item,1)
+            child = FPTreeNode(item,1,node)
+            self.registerNode(item,node)
+            self.incItemCount(item)
             node.addChild(child)
             node = child
+
+    def incItemCount(self,item,count=1):
+        itemCounts = self.itemCounts
+        if item in itemCounts:
+            itemCounts[item] += count
+        else:
+            itemCounts[item] = count       
+
+    def registerNode(self,item,node):
+        itemNodes = self.itemNodes
+        if item in itemNodes:
+            itemNodes[item].append(node)
+        else:
+            itemNodes[item] = [node]
 
     def updateItemset(self,itemset):
         """ takes a list of items, adds or updates a path in tree """
 
         node = self.root
-        for (i,item) in iterate(itemset):
+        node.incCount(len(itemset))
+        for (i,item) in enumerate(itemset):
             # loop invariant: node is a valid FPTreeNode
             children = node.children
             last = node
@@ -157,10 +177,14 @@ class FPTree(object):
                     node = child
                     break
             if node == None:
-                FPTree.addItemset(last,itemset[i:])
+                self.addItemset(last,itemset[i:])
                 return
             else:
-                child.incCount()
+                node.incCount()
+                self.incItemCount(item)
+
+def sortByFreq(l,counts):
+    return sorted(l,key=lambda x: counts[x],reverse=True)
     
 def buildFPTree(ds,min_sup):
     log.info('called on ds with {0} elements'.format(len(ds)))
@@ -172,29 +196,25 @@ def buildFPTree(ds,min_sup):
         counts = mergeCounts(counts,rowCounts)
     log.info('counted {0} elements'.format(len(counts)))
 
-    log.info('transforming dictionary into sorted tuples')
-    countTuples = []
-    for key in counts.keys():
-        countTuples.append((key,counts[key]))
-    log.info('transformed {0} tuples'.format(len(countTuples)))
+    log.info('finding the frequent elements')
+    freqElmnts = set(filter(lambda x: counts[x] > min_sup,counts.keys()))
+    log.info('found {0} frequent elements'.format(len(freqElmnts)))
 
-    log.info('filtering for those with more than the minimum support frequency')
-    countTuples = filter(lambda x: x[1] > min_sup,countTuples)
-    log.info('{0} remaining tuples after filtration'.format(len(countTuples)))
-
-    log.info('sorting tuples by support frequency')
-    countTuples = sorted(countTuples, key = lambda x: x[1], reverse=True)
-
+    log.info('building FP-Tree')
     fptree = FPTree()
     for row in ds:
-        
-        #fptree.update
-        pass
+        rowSet = set(row)
+        freqItems = sortByFreq(list(rowSet & freqElmnts),counts)
+        fptree.updateItemset(freqItems)
+    log.info('built FP-Tree with {0} nodes'.format(fptree.root.count))
+    log.info('root node has {0} children'.format(len(fptree.root.children)))
     return fptree
 
 def mineFPTree(fptree,k,min_sup):
     log.info('called')
-    return []
+    patterns = []
+    # use FP-Tree to find patterns
+    return patterns
 
 def fpGrowthPatterns(ds,k,min_sup=0):
     log.info('called on ds with {0} elements'.format(len(ds)))
