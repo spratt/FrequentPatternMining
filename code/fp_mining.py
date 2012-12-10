@@ -410,5 +410,5 @@ if __name__ == '__main__':
     print 'found {0} patterns of size {1}'.format(len(patterns),k)
     if max_results == -1:
         max_results = len(patterns)
-    for i in range(min(len(patterns),max_results):
+    for i in range(min(len(patterns),max_results)):
         print patterns[i]
