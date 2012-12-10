@@ -23,6 +23,7 @@ log_format = '[%(asctime)s %(funcName)s]: %(message)s'
 ######################################################################
 # Logging Setup
 ######################################################################
+
 log.basicConfig(filename=name+'_log.txt',\
                     level=log.INFO,\
                     format=log_format)
@@ -121,8 +122,15 @@ def aprioriPatterns(ds,k,min_sup=0):
 # FP-Growth
 ######################################################################
 # First we build a structure of information about frequent items
-# called the FP-Tree, then we use this structure to find frequent
-# patterns using the FP-Growth algorithm.
+# called the FP-Tree.  This tree stores nodes representing items in
+# the dataset and the number of times the prefix formed by the path
+# from the root to the node appears in itemsets in the dataset.
+#
+# Next, we mine the FP-Tree.  If the FP-Tree consists of a single
+# path, then all combinations of items along the path are frequent
+# patterns.  If the FP-Tree has many paths, we go through each item
+# and build conditional FP-Trees containing that item, recursively
+# mining those trees.
 ######################################################################
 
 class FPTreeNode(object):
