@@ -305,7 +305,7 @@ def mineFPTree(fptree,k,min_sup):
     if fptree.isSinglePath():
         log.info('fptree has one path')
         counts = fptree.itemCounts
-        candidatePatterns = filter(lambda x: counts[x] > min_sup,\
+        candidatePatterns = filter(lambda x: counts[x] >= min_sup,\
                                        counts.keys())
         log.info('{0} items have at least min_sup'.\
                      format(len(candidatePatterns)))
@@ -403,7 +403,18 @@ if __name__ == '__main__':
     log.info('==================== fp_mining tests ====================')
     log.info("Read {0} lines in {1}".format(len(ds),filename))
 
-    #patterns = aprioriPatterns(ds,k,len(ds)/2)
+    patterns = aprioriPatterns(ds,k,len(ds)/2)
+    
+    print 'found {0} patterns of size {1}'.format(len(patterns),k)
+    if max_results == -1:
+        max_results = len(patterns)
+    for i in range(min(len(patterns),max_results)):
+        print patterns[i]
+
+    max_results = -1
+    if len(sys.argv) > 3:
+        max_results = int(sys.argv[3])
+        
     patterns = fpGrowthPatterns(ds,k,len(ds)/2)
     #patterns = eclatPatterns(ds,k,len(ds)/2)
     
