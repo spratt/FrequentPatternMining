@@ -25,26 +25,51 @@ class Dataset(object):
             canonical = line.strip().lower()
             self.rows.append(canonical.split(" "))
 
+    def readFromDataset(self,ds):
+        if not hasattr(ds,'__IS_VERTICAL__'):
+            self.rows = []
+            for row in ds.rows:
+                nRow = []
+                for val in row:
+                    nRow.append(val)
+                self.rows.append(nRow)
+            return
+
+        transactions = set()
+        for row in ds.rows:
+            for transaction in row:
+                if transaction not in transactions:
+                    transactions.add(transaction)
+
+        rows = [[] for _ in transactions]
+        for (i,row) in enumerate(ds.rows):
+            for val in row:
+                rows[val].append(ds.values[i])
+        self.rows = rows
+
 class NumericalDataset(Dataset):
-    def readFromFile(self,f):
-        Dataset.readFromFile(self,f)
+    def _convertToNumerical(self):
         for row in range(len(self.rows)):
             for col in range(len(self.rows[row])):
                 val = self.rows[row][col]
                 self.rows[row][col] = int(val)
+    
+    def readFromFile(self,f):
+        Dataset.readFromFile(self,f)
+        self._convertToNumerical(self)
+
+    def readFromDataset(self,ds):
+        Dataset.readFromDataset(self,ds)
+        self._convertToNumerical(self)
 
 class VerticalDataset(Dataset):
     def __init__(self):
         self.rows = []
         self.__IS_VERTICAL__ = True
-    
-    def readFromDataset(self,ds):
-        transactions = ds.rows[:]
-        if hasattr(ds,'__IS_VERTICAL__'):
-            self.rows = transactions
-            self.values = ds.values[:]
-            return
 
+    def _convertToVertical(self):
+        transactions = self.rows
+        
         values = []
         for row in transactions:
             for val in row:
@@ -58,7 +83,18 @@ class VerticalDataset(Dataset):
 
         self.values = values
         self.rows = rows
-            
+
+    def readFromFile(self,f):
+        Dataset.readFromFile(self,f)
+        self._convertToVertical()
+    
+    def readFromDataset(self,ds):
+        if hasattr(ds,'__IS_VERTICAL__'):
+            self.rows = ds.rows[:]
+            self.values = ds.values[:]
+            return
+        Dataset.readFromDataset(self,ds)
+        self._convertToVertical()
                 
 ######################################################################
 # Basic Tests
@@ -82,7 +118,9 @@ if __name__ == '__main__':
 
     vds = VerticalDataset()
     vds.readFromDataset(ds)
-    for (i,val) in enumerate(vds.values):
-        print "{0}:{1}".format(i,val)
-    for row in vds.rows:
+    for (i,row) in enumerate(vds.rows):
+        print "{0}:{1}".format(vds.values[i],row)
+
+    ds.readFromDataset(vds)
+    for row in ds.rows:
         print row
