@@ -33,6 +33,33 @@ class NumericalDataset(Dataset):
                 val = self.rows[row][col]
                 self.rows[row][col] = int(val)
 
+class VerticalDataset(Dataset):
+    def __init__(self):
+        self.rows = []
+        self.__IS_VERTICAL__ = True
+    
+    def readFromDataset(self,ds):
+        transactions = ds.rows[:]
+        if hasattr(ds,'__IS_VERTICAL__'):
+            self.rows = transactions
+            self.values = ds.values[:]
+            return
+
+        values = []
+        for row in transactions:
+            for val in row:
+                if val not in values:
+                    values.append(val)
+
+        rows = [[] for _ in values]
+        for (i,row) in enumerate(transactions):
+            for val in row:
+                rows[values.index(val)].append(i)
+
+        self.values = values
+        self.rows = rows
+            
+                
 ######################################################################
 # Basic Tests
 ######################################################################
@@ -50,4 +77,12 @@ if __name__ == '__main__':
         ds.readFromFile(f)
         
     print "Read {0} lines in {1}".format(len(ds),filename)
-    print ds.rows[0]
+    for row in ds.rows:
+        print row
+
+    vds = VerticalDataset()
+    vds.readFromDataset(ds)
+    for (i,val) in enumerate(vds.values):
+        print "{0}:{1}".format(i,val)
+    for row in vds.rows:
+        print row
