@@ -11,6 +11,7 @@
 import itertools
 import unittest
 import fp_mining
+import dataset
 
 class TestFrequentPatternFunctions(unittest.TestCase):
 
@@ -25,5 +26,36 @@ class TestFrequentPatternFunctions(unittest.TestCase):
         
             self.assertEqual(icombs,fcombs)
 
+class TestDatasetFunctions(unittest.TestCase):
+
+    def test_dataset_conversion(self):
+        ds = dataset.Dataset()
+        ds.readFromFile('data/tiny.dat')
+        vds = dataset.VerticalDataset()
+        vds.readFromDataset(ds)
+        ds2 = dataset.Dataset()
+        ds2.readFromDataset(vds)
+
+        self.assertEqual(ds.rows,ds2.rows)
+        
+        ds.readFromFile('data/chess_tiny.dat')
+        vds = dataset.VerticalDataset()
+        vds.readFromDataset(ds)
+        ds2 = dataset.Dataset()
+        ds2.readFromDataset(vds)
+
+        self.assertEqual(ds.rows,ds2.rows)
+        
+        ds.readFromFile('data/chess.dat')
+        vds = dataset.VerticalDataset()
+        vds.readFromDataset(ds)
+        ds2 = dataset.Dataset()
+        ds2.readFromDataset(vds)
+
+        self.assertEqual(ds.rows,ds2.rows)
+            
 if __name__ == '__main__':
-    unittest.main()
+    tl = unittest.TestLoader()
+    suite = tl.loadTestsFromTestCase(TestFrequentPatternFunctions)
+    suite.addTest(tl.loadTestsFromTestCase(TestDatasetFunctions))
+    unittest.TextTestRunner(verbosity=2).run(suite)
