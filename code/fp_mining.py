@@ -374,7 +374,7 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 # TODO: Implement
 ######################################################################
 
-def eclatPatterns(ds,k):
+def eclatPatterns(ds,k,min_sup=0):
     pass
 
 ######################################################################
