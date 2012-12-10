@@ -329,6 +329,9 @@ def mineFPTree(fptree,k,min_sup):
     log.info('first item: {0}, frequency: {1}'.\
                  format(items[0],counts[items[0]]))
 
+    if k == 1:
+        return map(lambda x: [x],items)
+    
     for item in items:
         cpb = fptree.getConditionalPatternBase(item)
         log.info('conditional pattern base for {0} has {1} rows'.\
