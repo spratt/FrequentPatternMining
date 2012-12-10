@@ -111,9 +111,6 @@ def aprioriPatterns(ds,k,min_sup=0):
     log.info('found {0} k={1} patterns'.format(len(candidates),k))
     return candidates
 
-def testApriori(ds):
-    print aprioriPatterns(ds,5,len(ds)/2)
-
 ######################################################################
 # FP-Growth
 ######################################################################
@@ -155,6 +152,9 @@ class FPTree(object):
         self.root = FPTreeNode(None,0)
         self.itemCounts = dict()
         self.itemNodes = dict()
+
+    def __len__(self):
+        return self.root.count
 
     def __str__(self):
         return self.gvString()
@@ -211,8 +211,6 @@ class FPTree(object):
             prefixPath = node.prefixPath()
             if len(prefixPath) == 0:
                 continue
-            log.info('found {0} times prefixPath:{1}'.\
-                         format(node.count,prefixPath))
             for _ in range(node.count):
                 base.append(prefixPath)
         return base
@@ -261,15 +259,54 @@ def buildFPTree(ds,min_sup):
         rowSet = set(row)
         freqItems = sortByFreq(list(rowSet & freqElmnts),counts)
         fptree.updateItemset(freqItems)
-    log.info('built FP-Tree with {0} nodes'.format(fptree.root.count))
+    log.info('built FP-Tree with {0} support'.format(fptree.root.count))
     log.info('root node has {0} children'.format(len(fptree.root.children)))
     log.info('FP-Tree is a single path? {0}'.format(fptree.isSinglePath()))
     return fptree
+
+def combsOfSize(l,k):
+    if k == 1:
+        return map(lambda x: [x],l)
+    combs = []
+    if len(l) < k or k < 1:
+        return combs
+    for (i,x) in enumerate(l):
+        for y in combsOfSize(l[i+1:],k-1):
+            combs.append([x] + y)
+    return combs
+
+def allCombinations(l):
+    combs = []
+    for (i,x) in enumerate(l):
+        combs.append([x])
+        for y in allCombinations(l[i+1:]):
+            combs.append([x] + y)
+    return combs
 
 def mineFPTree(fptree,k,min_sup):
     log.info('called')
     patterns = []
 
+    # base case: fptree has a single path
+    if fptree.isSinglePath():
+        log.info('fptree has one path')
+        counts = fptree.itemCounts
+        candidatePatterns = filter(lambda x: counts[x] > min_sup,\
+                                       counts.keys())
+        log.info('{0} items have at least min_sup'.\
+                     format(len(candidatePatterns)))
+        candidatePatterns = combsOfSize(candidatePatterns,k)
+        log.info('generated {0} candidate patterns'.\
+                     format(len(candidatePatterns)))
+        for cand in candidatePatterns:
+            if len(cand) < k:
+                continue
+            patterns.append(cand)
+        log.info('filtered candidates down to {0} patterns'.\
+                     format(len(patterns)))
+        return patterns
+
+    log.info('fptree has many paths')
     log.info('building item list sorted by frequency ascending')
     counts = fptree.itemCounts
     items = counts.keys()
@@ -283,9 +320,18 @@ def mineFPTree(fptree,k,min_sup):
         log.info('conditional pattern base for {0} has {1} rows'.\
                      format(item,len(cpb)))
     
-        #log.info('generating conditional FP-Tree')
-    
-        #log.info('generating frequent patterns')
+        cfpt = buildFPTree(cpb,min_sup)
+        log.info('generated conditional FP-Tree with {0} support'.\
+                     format(len(cfpt)))
+
+        cfp = mineFPTree(cfpt,k-1,min_sup)
+        log.info('mined FP-Tree')
+        for fp in cfp:
+            pattern = fp + [item]
+            if pattern not in patterns:
+                patterns.append(pattern)
+        log.info('generated {0} new patterns ending in {1}'.\
+                     format(len(cfp),item))
     
     return patterns
 
@@ -302,12 +348,6 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 
     return patterns
 
-def testFPTree(ds):
-    print buildFPTree(ds,len(ds)/2)
-
-def testFPGrowth(ds):
-    print fpGrowthPatterns(ds,5,len(ds)/2)
-
 ######################################################################
 # Eclat
 ######################################################################
@@ -322,11 +362,17 @@ if __name__ == '__main__':
 
     import sys
 
-    if len(sys.argv) < 2:
-        print "usage: {0} [file]".format(sys.argv[0])
+    if len(sys.argv) < 3:
+        print "usage: {0} [file] [k] [results]".format(sys.argv[0])
         sys.exit(-1)
 
     filename = sys.argv[1]
+    k = int(sys.argv[2])
+
+    max_results = -1
+    if len(sys.argv) > 3:
+        max_results = int(sys.argv[3])
+    
     ds = NumericalDataset()
     with open(filename,'rU') as f:
         ds.readFromFile(f)
@@ -335,6 +381,10 @@ if __name__ == '__main__':
     log.info("Read {0} lines in {1}".format(len(ds),filename))
 
     # run test here
-    #testApriori(ds)
-    #testFPTree(ds)
-    testFPGrowth(ds)
+    #patterns = print aprioriPatterns(ds,k,len(ds)/2)
+    patterns = fpGrowthPatterns(ds,k,len(ds)/2)
+    print 'found {0} patterns of size {1}'.format(len(patterns),k)
+    if max_results == -1:
+        max_results = len(patterns)
+    for i in range(max_results):
+        print patterns[i]

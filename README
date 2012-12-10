@@ -7,8 +7,8 @@ the author as a term project in COMP4106: Artificial Intelligence at
 Carleton University in the Fall of 2012.
 
 Implementations:
-  - [ ] Apriori
-  - [ ] FP-Growth
+  - [X] Apriori
+  - [X] FP-Growth
   - [ ] Eclat
 
 The following datasets were retrieved from the FIMI dataset repository
