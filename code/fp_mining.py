@@ -403,7 +403,6 @@ if __name__ == '__main__':
     log.info('==================== fp_mining tests ====================')
     log.info("Read {0} lines in {1}".format(len(ds),filename))
 
-    # run test here
     #patterns = aprioriPatterns(ds,k,len(ds)/2)
     patterns = fpGrowthPatterns(ds,k,len(ds)/2)
     #patterns = eclatPatterns(ds,k,len(ds)/2)
