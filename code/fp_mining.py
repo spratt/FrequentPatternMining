@@ -404,8 +404,10 @@ if __name__ == '__main__':
     log.info("Read {0} lines in {1}".format(len(ds),filename))
 
     # run test here
-    #patterns = print aprioriPatterns(ds,k,len(ds)/2)
+    #patterns = aprioriPatterns(ds,k,len(ds)/2)
     patterns = fpGrowthPatterns(ds,k,len(ds)/2)
+    #patterns = eclatPatterns(ds,k,len(ds)/2)
+    
     print 'found {0} patterns of size {1}'.format(len(patterns),k)
     if max_results == -1:
         max_results = len(patterns)
