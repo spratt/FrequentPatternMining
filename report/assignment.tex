@@ -1,0 +1,36 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LatexTemplate
+% November 10, 2012
+% By Simon Pratt (mostly)
+\documentclass[11pt]{article}
+
+\usepackage{Assignment}
+\usepackage{CGAlgorithms}
+\usepackage{QuestionAnswer}
+\usepackage{TheoremStuff}
+\usepackage{HeaderStuff}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Multicolumn stuff
+\usepackage{multicol}
+\usepackage{newclude} % \include without \clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Configuration
+\fancyhead[L]{COMP4106 - Final Project}
+\fancyhead[R]{Simon Pratt - 100663987}
+\bibliographystyle{plain}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+\begin{document}
+\begin{multicols}{2} % remove line if you don't want multiple columns
+
+% Content starts here
+Content
+% Content ends here
+
+\bibliography{references}
+
+\end{multicols} % remove line if you don't want multiple columns
+\end{document}

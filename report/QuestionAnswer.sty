@@ -1,0 +1,14 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Question and Answer environments
+% modified from Michiel Smid's code
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ProvidesPackage{QuestionAnswer}
+
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\newcounter{ques}
+\newenvironment{question}{\stepcounter{ques}{\noindent\bf Question \arabic{ques}:}\tiny\color{Gray}}{}
+\newenvironment{qinfo}{\tiny\color{Gray}}{}
+\newenvironment{answer}{{\noindent\bf Answer \arabic{ques}:}}{\vspace{5mm}}

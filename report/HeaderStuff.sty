@@ -1,0 +1,15 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header/footer
+% Mostly taken from: 
+%  https://texblog.wordpress.com/2007/11/07/headerfooter-in-latex-with-fancyhdr/
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ProvidesPackage{HeaderStuff}
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhead{}             % clear header
+\fancyfoot{}             % clear footer
+
+\fancyhead[C]{Page \thepage}
