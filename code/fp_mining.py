@@ -365,6 +365,14 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 ######################################################################
 # Eclat
 ######################################################################
+# Eclat stands for Equivalence CLAss Transform.
+#
+# First we divide up the items, then build equivalence classes for
+# patterns beginning with each item.
+#
+# TODO: Clarify this documentation
+# TODO: Implement
+######################################################################
 
 def eclatPatterns(ds,k):
     pass
