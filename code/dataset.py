@@ -10,6 +10,12 @@
 # For copyright information, see COPYRIGHT file
 ######################################################################
 
+######################################################################
+# Dataset
+######################################################################
+# The most basic dataset which stores itemsets as rows.
+######################################################################
+
 class Dataset(object):
     def __init__(self):
         self.rows = []
@@ -47,6 +53,13 @@ class Dataset(object):
                 rows[val].append(ds.values[i])
         self.rows = rows
 
+######################################################################
+# NumericalDataset
+######################################################################
+# This dataset also stores itemsets as rows, but converts the items to
+# integers.
+######################################################################
+
 class NumericalDataset(Dataset):
     def _convertToNumerical(self):
         for row in range(len(self.rows)):
@@ -61,6 +74,14 @@ class NumericalDataset(Dataset):
     def readFromDataset(self,ds):
         Dataset.readFromDataset(self,ds)
         self._convertToNumerical(self)
+
+######################################################################
+# VerticalDataset
+######################################################################
+# This dataset stores item values in a list of values and for each
+# item value there is a list of itemsets in which it appears, these
+# lists are stored in rows.
+######################################################################
 
 class VerticalDataset(Dataset):
     def __init__(self):
