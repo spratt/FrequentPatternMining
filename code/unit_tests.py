@@ -30,7 +30,7 @@ class TestDatasetFunctions(unittest.TestCase):
 
     def test_dataset_conversion(self):
         ds = dataset.Dataset()
-        ds.readFromFile('data/tiny.dat')
+        ds.readFromFile('../data/tiny.dat')
         vds = dataset.VerticalDataset()
         vds.readFromDataset(ds)
         ds2 = dataset.Dataset()
@@ -38,7 +38,7 @@ class TestDatasetFunctions(unittest.TestCase):
 
         self.assertEqual(ds.rows,ds2.rows)
         
-        ds.readFromFile('data/chess_tiny.dat')
+        ds.readFromFile('../data/chess_tiny.dat')
         vds = dataset.VerticalDataset()
         vds.readFromDataset(ds)
         ds2 = dataset.Dataset()
@@ -46,7 +46,7 @@ class TestDatasetFunctions(unittest.TestCase):
 
         self.assertEqual(ds.rows,ds2.rows)
         
-        ds.readFromFile('data/chess.dat')
+        ds.readFromFile('../data/chess.dat')
         vds = dataset.VerticalDataset()
         vds.readFromDataset(ds)
         ds2 = dataset.Dataset()
