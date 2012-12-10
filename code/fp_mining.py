@@ -18,8 +18,14 @@ from dataset import Dataset, NumericalDataset
 ######################################################################
 
 name = 'fp_mining'
-format = '[%(asctime)s %(funcName)s]: %(message)s'.format(name)
-log.basicConfig(filename=name+'_log.txt',level=log.INFO,format=format)
+log_format = '[%(asctime)s %(funcName)s]: %(message)s'
+
+######################################################################
+# Logging Setup
+######################################################################
+log.basicConfig(filename=name+'_log.txt',\
+                    level=log.INFO,\
+                    format=log_format)
 
 ######################################################################
 # Apriori
