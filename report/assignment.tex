@@ -27,7 +27,92 @@
 \begin{multicols}{2} % remove line if you don't want multiple columns
 
 % Content starts here
-Content
+
+\section{The Problem}
+
+The problem domain is to find frequent patterns in large data sets.
+
+\subsection{Motivation}
+
+Frequent patterns in data can give us insight into the semantic
+meaning of the data.  In particular, if we are mining for frequent
+patterns in a data set of actions we can identify typical workflow and
+anomalous activity, which could be useful for security or process
+optimization.
+
+\section{Algorithms}
+
+I implemented the following algorithms: \texttt{Apriori},
+\texttt{FP-growth}, and \texttt{Eclat} \cite{Han2007,fpmlecture}.
+
+\subsection{Apriori}
+
+In which we describe the Apriori algorithm.
+
+\subsection{FP-Growth}
+
+In which we describe the FP-Growth algorithm.
+
+\subsection{Eclat}
+
+In which we describe the Eclat algorithm.
+
+\section{Challenges}
+
+In which we describe the challenges encountered.
+
+\section{Results}
+\label{sec:results}
+
+In which we describe the results of the experiments.
+
+\section{Future Work}
+
+In which we describe possible enhancements to the study.
+
+\appendix
+\section{Running Requirements}
+
+To run the code, you simply need to have \texttt{Python 2.6}
+installed.  \texttt{Python 2.7} should also work, but the first line
+in each python script references \texttt{Python 2.6} in particular,
+which should be changed if running on \texttt{Python 2.7}.
+
+There are 4 python scripts included in the code directory:
+\texttt{dataset.py}, \texttt{fp\_mining.py}, \texttt{timing.py}, and
+\texttt{unit\_tests.py}.
+
+\texttt{dataset.py} simply handles the parsing of files into a simple
+datastructure to use for pattern mining.  Running this file with the
+name of a datafile as a parameter will run some simple tests on the
+module and print the input dataset in its \texttt{Python} format.  The
+expected file format is described in the next appendix.
+
+\texttt{fp\_mining.py} containins the algorithm logic for
+\texttt{Apriori}, \texttt{FP-Growth}, and \texttt{Eclat}.  The
+expected usage of this script is as follows:
+
+\texttt{fp\_mining.py [file] [k] [results]}
+
+Where [file] is the name of an input file, [k] is the desired length
+of patterns to mine, and [results] is an optional positive integer
+specifying how many results to print.  If [results] is ommitted, all
+resulting patterns will be printed.
+
+Note also that this script produces detailed logging output to the
+standard error stream on unix, which can be redirected by use of the
+``2>'' operator.
+
+\texttt{timing.py} runs the timed tests used to generate the output
+discussed in section \ref{sec:results} Results.  This runs a sequence
+of timed tests and prints aggregate information.
+
+\texttt{unit\_tests.py} runs the unit tests for the code base.
+
+\section{Datafile Format}
+
+In which we describe the input data file format.
+
 % Content ends here
 
 \bibliography{references}
