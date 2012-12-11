@@ -11,23 +11,16 @@
 
 from collections import deque
 from itertools import combinations
-import logging as log
+import logging
+import logging.config
 from dataset import Dataset, NumericalDataset, VerticalDataset
-
-######################################################################
-# Configuration
-######################################################################
-
-name = 'fp_mining'
-log_format = '[%(asctime)s %(funcName)s]: %(message)s'
 
 ######################################################################
 # Logging Setup
 ######################################################################
 
-log.basicConfig(filename=name+'_log.txt',\
-                    level=log.INFO,\
-                    format=log_format)
+logging.config.fileConfig('../config/logging.conf')
+log = logging.getLogger('fpLog')
 
 ######################################################################
 # Apriori
@@ -76,7 +69,7 @@ def sort(l):
 
 def aprioriCandidatePatterns(ds,min_sup,prevCands=None):
     """ given dataset ds, min_sup, and prevCands, find next candidates """
-    log.info('called')
+    log.debug('called')
     if len(prevCands) == 0:
         return []
     if prevCands == None:
@@ -88,24 +81,24 @@ def aprioriCandidatePatterns(ds,min_sup,prevCands=None):
         for item in items:
             if item[0] not in prevCand:
                 cands.append(prevCand + item)
-    log.info('generated {0} k={1} candidates'.format(len(cands),k))
+    log.debug('generated {0} k={1} candidates'.format(len(cands),k))
     cands = list(set(map(lambda x: str(sort(x)),cands)))
     cands = map(lambda x: eval(x),cands)
-    log.info('generated {0} k={1} canonical candidates'.format(len(cands),k))
+    log.debug('generated {0} k={1} canonical candidates'.format(len(cands),k))
     counts = dict()
     for row in ds:
         rowCounts = countCandidates(row,cands)
         counts = mergeCounts(counts,rowCounts)
-    log.info('counted candidate pattern occurrences')
+    log.debug('counted candidate pattern occurrences')
     keys = counts.keys()
     keys = filter(lambda x: counts[x] >= min_sup,keys)
     candidates = map(lambda x: eval(x),keys)
-    log.info('found {0} k={1} patterns'.format(len(candidates),k))
+    log.debug('found {0} k={1} patterns'.format(len(candidates),k))
     return candidates
 
 def aprioriPatterns(ds,k,min_sup=0):
     """ given dataset ds, find frequent k-patterns with min support min_sup """
-    log.info('called')
+    log.debug('called')
     counts = dict()
     for row in ds:
         rowCounts = countItems(row)
@@ -113,7 +106,7 @@ def aprioriPatterns(ds,k,min_sup=0):
     keys = counts.keys()
     keys = filter(lambda x: counts[x] >= min_sup,keys)
     candidates = map(lambda x: [x], keys)
-    log.info('generated {0} k=1 candidates'.format(len(candidates)))
+    log.debug('generated {0} k=1 candidates'.format(len(candidates)))
     for i in range(1,k):
         candidates = aprioriCandidatePatterns(ds,min_sup,candidates)
     log.info('found {0} k={1} patterns'.format(len(candidates),k))
@@ -255,63 +248,63 @@ def sortByFreq(l,counts,reverse=True):
     return sorted(l,key=lambda x: counts[x],reverse=reverse)
     
 def buildFPTree(ds,min_sup):
-    log.info('called on ds with {0} elements'.format(len(ds)))
+    log.debug('called on ds with {0} elements'.format(len(ds)))
 
-    log.info('counting elements')
+    log.debug('counting elements')
     counts = dict()
     for row in ds:
         rowCounts = countItems(row)
         counts = mergeCounts(counts,rowCounts)
-    log.info('counted {0} elements'.format(len(counts)))
+    log.debug('counted {0} elements'.format(len(counts)))
 
-    log.info('finding the frequent elements')
+    log.debug('finding the frequent elements')
     freqElmnts = set(filter(lambda x: counts[x] >= min_sup,counts.keys()))
-    log.info('found {0} frequent elements'.format(len(freqElmnts)))
+    log.debug('found {0} frequent elements'.format(len(freqElmnts)))
 
-    log.info('building FP-Tree')
+    log.debug('building FP-Tree')
     fptree = FPTree()
     for row in ds:
         rowSet = set(row)
         freqItems = sortByFreq(list(rowSet & freqElmnts),counts)
         fptree.updateItemset(freqItems)
-    log.info('built FP-Tree with {0} support'.format(fptree.root.count))
-    log.info('root node has {0} children'.format(len(fptree.root.children)))
-    log.info('FP-Tree is a single path? {0}'.format(fptree.isSinglePath()))
+    log.debug('built FP-Tree with {0} support'.format(fptree.root.count))
+    log.debug('root node has {0} children'.format(len(fptree.root.children)))
+    log.debug('FP-Tree is a single path? {0}'.format(fptree.isSinglePath()))
     return fptree
 
 def combsOfSize(l,k):
     return [list(val) for val in combinations(l,k)]
 
 def mineFPTree(fptree,k,min_sup):
-    log.info('called')
+    log.debug('called')
     patterns = []
 
     # base case: fptree has a single path
     if fptree.isSinglePath():
-        log.info('fptree has one path')
+        log.debug('fptree has one path')
         counts = fptree.itemCounts
         candidatePatterns = filter(lambda x: counts[x] >= min_sup,\
                                        counts.keys())
-        log.info('{0} items have at least min_sup'.\
+        log.debug('{0} items have at least min_sup'.\
                      format(len(candidatePatterns)))
         candidatePatterns = combsOfSize(candidatePatterns,k)
-        log.info('generated {0} candidate patterns'.\
+        log.debug('generated {0} candidate patterns'.\
                      format(len(candidatePatterns)))
         for cand in candidatePatterns:
             if len(cand) < k:
                 continue
             patterns.append(cand)
-        log.info('filtered candidates down to {0} patterns'.\
+        log.debug('filtered candidates down to {0} patterns'.\
                      format(len(patterns)))
         return patterns
 
-    log.info('fptree has many paths')
-    log.info('building item list sorted by frequency ascending')
+    log.debug('fptree has many paths')
+    log.debug('building item list sorted by frequency ascending')
     counts = fptree.itemCounts
     items = counts.keys()
     items = sortByFreq(items,counts,False)
-    log.info('found {0} items'.format(len(items)))
-    log.info('first item: {0}, frequency: {1}'.\
+    log.debug('found {0} items'.format(len(items)))
+    log.debug('first item: {0}, frequency: {1}'.\
                  format(items[0],counts[items[0]]))
 
     if k == 1:
@@ -319,32 +312,32 @@ def mineFPTree(fptree,k,min_sup):
     
     for item in items:
         cpb = fptree.getConditionalPatternBase(item)
-        log.info('conditional pattern base for {0} has {1} rows'.\
+        log.debug('conditional pattern base for {0} has {1} rows'.\
                      format(item,len(cpb)))
     
         cfpt = buildFPTree(cpb,min_sup)
-        log.info('generated conditional FP-Tree with {0} support'.\
+        log.debug('generated conditional FP-Tree with {0} support'.\
                      format(len(cfpt)))
 
         cfp = mineFPTree(cfpt,k-1,min_sup)
-        log.info('mined FP-Tree')
+        log.debug('mined FP-Tree')
         for fp in cfp:
             pattern = fp + [item]
             if pattern not in patterns:
                 patterns.append(pattern)
-        log.info('generated {0} new patterns ending in {1}'.\
+        log.debug('generated {0} new patterns ending in {1}'.\
                      format(len(cfp),item))
-    
+    log.debug('generated {0} patterns'.format(len(patterns)))
     return patterns
 
 def fpGrowthPatterns(ds,k,min_sup=0):
-    log.info('called on ds with {0} elements'.format(len(ds)))
+    log.debug('called on ds with {0} elements'.format(len(ds)))
     
-    log.info('building FP-Tree')
+    log.debug('building FP-Tree')
     fptree = buildFPTree(ds,min_sup)
-    log.info('FP-Tree built')
+    log.debug('FP-Tree built')
 
-    log.info('running FP-Growth on FP-Tree')
+    log.debug('running FP-Growth on FP-Tree')
     patterns = mineFPTree(fptree,k,min_sup)
     log.info('FP-Growth found {0} patterns'.format(len(patterns)))
 
@@ -363,8 +356,11 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 ######################################################################
 
 def eclatPatterns(vds,k,min_sup=0):
-    log.info('called')
-    assert hasattr(vds,'__IS_VERTICAL__')
+    log.debug('called')
+    if not hasattr(vds,'__IS_VERTICAL__'):
+        ds = vds
+        vds = VerticalDataset()
+        vds.readFromDataset(ds)
 
     patterns = []
     combs = combinations(vds.tidsets.keys(),k)
@@ -400,7 +396,6 @@ if __name__ == '__main__':
     with open(filename,'rU') as f:
         ds.readFromFile(f)
 
-    log.info('==================== fp_mining tests ====================')
     log.info("Read {0} lines in {1}".format(len(ds),filename))
 
     patterns = aprioriPatterns(ds,k,len(ds)/2)

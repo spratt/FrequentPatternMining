@@ -5,3 +5,5 @@
 *.pdf
 *.pyc
 *log.txt
+log/
+logs/
