@@ -9,7 +9,7 @@ Carleton University in the Fall of 2012.
 Implementations:
   - [X] Apriori
   - [X] FP-Growth
-  - [ ] Eclat
+  - [X] Eclat
 
 The following datasets were retrieved from the FIMI dataset repository
 [1] on December 6th, 2012:
