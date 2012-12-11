@@ -69,11 +69,11 @@ class NumericalDataset(Dataset):
     
     def readFromFile(self,f):
         Dataset.readFromFile(self,f)
-        self._convertToNumerical(self)
+        self._convertToNumerical()
 
     def readFromDataset(self,ds):
         Dataset.readFromDataset(self,ds)
-        self._convertToNumerical(self)
+        self._convertToNumerical()
 
 ######################################################################
 # VerticalDataset

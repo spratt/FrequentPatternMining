@@ -10,6 +10,7 @@
 ######################################################################
 
 from collections import deque
+from itertools import combinations
 import logging as log
 from dataset import Dataset, NumericalDataset
 
@@ -279,23 +280,7 @@ def buildFPTree(ds,min_sup):
     return fptree
 
 def combsOfSize(l,k):
-    if k == 1:
-        return map(lambda x: [x],l)
-    combs = []
-    if len(l) < k or k < 1:
-        return combs
-    for (i,x) in enumerate(l):
-        for y in combsOfSize(l[i+1:],k-1):
-            combs.append([x] + y)
-    return combs
-
-def allCombinations(l):
-    combs = []
-    for (i,x) in enumerate(l):
-        combs.append([x])
-        for y in allCombinations(l[i+1:]):
-            combs.append([x] + y)
-    return combs
+    return [list(val) for val in combinations(l,k)]
 
 def mineFPTree(fptree,k,min_sup):
     log.info('called')

@@ -14,17 +14,7 @@ import fp_mining
 import dataset
 
 class TestFrequentPatternFunctions(unittest.TestCase):
-
-    def test_combinations(self):
-        items = [1,2,3,4,5,6,7,8,9]
-
-        for i in range(len(items)-1):
-            r = len(items) - i
-
-            icombs = [list(val) for val in itertools.combinations(items,r)]
-            fcombs = fp_mining.combsOfSize(items,r)
-        
-            self.assertEqual(icombs,fcombs)
+    """ Unit tests for fp_mining """
 
 class TestDatasetFunctions(unittest.TestCase):
 
