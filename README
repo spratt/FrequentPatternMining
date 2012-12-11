@@ -13,11 +13,11 @@ Implementations:
 
 The following datasets were retrieved from the FIMI dataset repository
 [1] on December 6th, 2012:
-  - chess.dat
-  - connect.dat
-  - mushroom.dat
-  - pumsb.dat
-  - pumsb_star.dat
+  - data/chess.dat
+  - data/connect.dat
+  - data/mushroom.dat
+  - data/pumsb.dat
+  - data/pumsb_star.dat
 
 Resources used:
  - [1]: http://fimi.ua.ac.be/data/
