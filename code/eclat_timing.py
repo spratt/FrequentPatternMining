@@ -36,15 +36,19 @@ runs = 1
 
 trials = 1
 
+support_percents = [.1,.2,.3,.4,.5]
+
+start_count = 3000
+
+# Read runs from command line if given
 if len(sys.argv) > 2:
     runs = int(sys.argv[2])
     runs = runs if runs > 0 else 1
 
+# Read trials from command line if given
 if len(sys.argv) > 3:
     trials = int(sys.argv[3])
     trials = trials if trials > 0 else 1
-
-support_percents = [.1,.2,.3,.4,.5]
 
 ######################################################################
 # Logic
@@ -59,15 +63,15 @@ class Incrementor(object):
         self.i += 1
         return old
 
-i = Incrementor()
+i = Incrementor(start_count)
 
 out_file = open(file_out,'a')
 
 def timePatterns(ds,k,min_sup,runs):
     timers = {}
-    timers['apriori'] = Timer(lambda: aprioriPatterns(ds,k,min_sup))
-    timers['fp-growth'] = Timer(lambda: fpGrowthPatterns(ds,k,min_sup))
-    #timers['eclat'] = Timer(lambda: eclatPatterns(ds,k,min_sup))
+    #timers['apriori'] = Timer(lambda: aprioriPatterns(ds,k,min_sup))
+    #timers['fp-growth'] = Timer(lambda: fpGrowthPatterns(ds,k,min_sup))
+    timers['eclat'] = Timer(lambda: eclatPatterns(ds,k,min_sup))
 
     for key in timers.keys():
         timer = timers[key]
