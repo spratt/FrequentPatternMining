@@ -12,7 +12,7 @@
 from collections import deque
 from itertools import combinations
 import logging as log
-from dataset import Dataset, NumericalDataset
+from dataset import Dataset, NumericalDataset, VerticalDataset
 
 ######################################################################
 # Configuration
@@ -362,8 +362,20 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 # TODO: Implement
 ######################################################################
 
-def eclatPatterns(ds,k,min_sup=0):
-    pass
+def eclatPatterns(vds,k,min_sup=0):
+    log.info('called')
+    assert hasattr(vds,'__IS_VERTICAL__')
+
+    patterns = []
+    combs = combinations(vds.tidsets.keys(),k)
+    for tup in combs:
+        sets = map(lambda x: vds.tidsets[x],tup)
+        items = reduce(lambda x,y: x & y if len(x & y) >= min_sup else set(),\
+                           sets)
+        if len(items) >= min_sup:
+            patterns.append(list(tup))
+    log.info('found {0} frequent patterns'.format(len(patterns)))
+    return patterns
 
 ######################################################################
 # Basic Tests
@@ -404,7 +416,16 @@ if __name__ == '__main__':
         max_results = int(sys.argv[3])
         
     patterns = fpGrowthPatterns(ds,k,len(ds)/2)
-    #patterns = eclatPatterns(ds,k,len(ds)/2)
+    
+    print 'found {0} patterns of size {1}'.format(len(patterns),k)
+    if max_results == -1:
+        max_results = len(patterns)
+    for i in range(min(len(patterns),max_results)):
+        print patterns[i]
+        
+    vds = VerticalDataset()
+    vds.readFromDataset(ds)
+    patterns = eclatPatterns(vds,k,len(ds)/2)
     
     print 'found {0} patterns of size {1}'.format(len(patterns),k)
     if max_results == -1:

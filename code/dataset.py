@@ -10,6 +10,8 @@
 # For copyright information, see COPYRIGHT file
 ######################################################################
 
+from collections import defaultdict
+
 ######################################################################
 # Dataset
 ######################################################################
@@ -35,23 +37,14 @@ class Dataset(object):
         if not hasattr(ds,'__IS_VERTICAL__'):
             self.rows = []
             for row in ds.rows:
-                nRow = []
-                for val in row:
-                    nRow.append(val)
-                self.rows.append(nRow)
+                self.rows.append(row[:])
             return
-
-        transactions = set()
-        for row in ds.rows:
-            for transaction in row:
-                if transaction not in transactions:
-                    transactions.add(transaction)
-
-        rows = [[] for _ in transactions]
-        for (i,row) in enumerate(ds.rows):
-            for val in row:
-                rows[val].append(ds.values[i])
-        self.rows = rows
+        
+        transactions = defaultdict(list)
+        for key in ds.tidsets.keys():
+            for val in ds.tidsets[key]:
+                transactions[val].append(key)
+        self.rows = transactions.values()
 
 ######################################################################
 # NumericalDataset
@@ -85,25 +78,18 @@ class NumericalDataset(Dataset):
 
 class VerticalDataset(Dataset):
     def __init__(self):
-        self.rows = []
+        self.tidsets = defaultdict(set)
         self.__IS_VERTICAL__ = True
 
     def _convertToVertical(self):
         transactions = self.rows
-        
-        values = []
-        for row in transactions:
-            for val in row:
-                if val not in values:
-                    values.append(val)
 
-        rows = [[] for _ in values]
+        tidsets = defaultdict(set)
         for (i,row) in enumerate(transactions):
             for val in row:
-                rows[values.index(val)].append(i)
+                tidsets[val].add(i)
 
-        self.values = values
-        self.rows = rows
+        self.tidsets = tidsets
 
     def readFromFile(self,f):
         Dataset.readFromFile(self,f)
@@ -139,8 +125,8 @@ if __name__ == '__main__':
 
     vds = VerticalDataset()
     vds.readFromDataset(ds)
-    for (i,row) in enumerate(vds.rows):
-        print "{0}:{1}".format(vds.values[i],row)
+    for key in vds.tidsets.keys():
+        print "{0}:{1}".format(key,vds.tidsets[key])
 
     ds.readFromDataset(vds)
     for row in ds.rows:
