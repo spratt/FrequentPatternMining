@@ -44,8 +44,9 @@ optimization.
 
 \section{Algorithms}
 
-I implemented the following algorithms: \texttt{Apriori},
-\texttt{FP-growth}, and \texttt{Eclat} \cite{Han2007,fpmlecture}.
+I implemented the following algorithms for mining frequent patterns:
+\texttt{Apriori}, \texttt{FP-growth}, and \texttt{Eclat}
+\cite{Han2007,fpmlecture}.
 
 \subsection{Apriori}
 
@@ -63,6 +64,10 @@ In which we describe the Eclat algorithm.
 
 In which we describe the challenges encountered.
 
+\section{Testing Methodology}
+
+In which we describe the methodology of the testing.
+
 \section{Results}
 \label{sec:results}
 
@@ -70,7 +75,9 @@ In which we describe the results of the experiments.
 
 \section{Future Work}
 
-In which we describe possible enhancements to the study.
+One possible direction in which to extend this study is to use the
+results of mining datasets for frequent patterns to learn association
+rules between items. \cite{wiki_arl}
 
 \appendix
 \section{Running Requirements}
@@ -103,7 +110,7 @@ resulting patterns will be printed.
 
 Note also that this script produces detailed logging output to the
 standard error stream on unix, which can be redirected by use of the
-``2>'' operator.
+\texttt{2>} operator.
 
 \texttt{timing.py} runs the timed tests used to generate the output
 discussed in the Results section.  This runs a sequence
@@ -114,7 +121,41 @@ of timed tests and prints aggregate information.
 \section{Datafile Format}
 
 The datafiles used for testing were retrieved from the FIMI dataset
-repository \cite{fimiDatasetRepo}.
+repository \cite{fimiDatasetRepo}.  The datasets are in a horizontal
+format in which each line is an itemset and the items within the set
+are integers separated by a single space.  For example, the
+hand-written \texttt{tiny.dat} dataset is simply:
+
+\texttt{1 2 3\newline
+1 2 4\newline
+1 5 6\newline
+1 5 7}
+
+The first line is an itemset containing items 1, 2, and 3.  An
+important part of the \texttt{Eclat} algorithm is conversion from the
+horizontal format to vertical format.
+
+The vertical format of the same data is a dictionary wherein each item
+is a key and the value is a \emph{transaction id} set, or
+\texttt{tidset}, which contains the IDs of each transaction containing
+the key item.
+
+The equivalent vertical format for the \texttt{tiny.dat} dataset is:
+
+\begin{align*}
+  1 &: \{ 0, 1, 2, 3 \} \\
+  2 &: \{ 0, 1 \} \\
+  3 &: \{ 0 \} \\
+  4 &: \{ 1 \} \\
+  5 &: \{ 2, 3 \} \\
+  6 &: \{ 2 \} \\
+  7 &: \{ 3 \} \\
+\end{align*}
+
+And in \texttt{Python} representation as a dict:
+
+\texttt{\{1:set([0,1,2,3]),2:set([0,1]),3:set([0]),\newline
+4:set([1]),5:set([2,3]),6:set([2]),7:set([3])\}}
 
 % Content ends here
 
