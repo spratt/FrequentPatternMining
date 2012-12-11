@@ -348,11 +348,17 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 ######################################################################
 # Eclat stands for Equivalence CLAss Transform.
 #
-# First we divide up the items, then build equivalence classes for
-# patterns beginning with each item.
+# This algorithm is based around the properties of the vertical data
+# format, in which each item has an associated transaction id set
+# (tidset).  The support of an individual item is simply the
+# cardinality of its tidset.  The support of more than one item is
+# simply the cardinality of the intersection of the tidsets of the
+# items.
 #
-# TODO: Clarify this documentation
-# TODO: Implement
+# To find all the k-patterns on a dataset, Eclat simply iterates over
+# all k-combinations of items and for each it checks the cardinality
+# of the intersection of the items in the combination.  If the
+# cardinality is at least the minimum support, it reports the pattern.
 ######################################################################
 
 def eclatPatterns(vds,k,min_sup=0):
