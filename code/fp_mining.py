@@ -98,7 +98,7 @@ def aprioriCandidatePatterns(ds,min_sup,prevCands=None):
 
 def aprioriPatterns(ds,k,min_sup=0):
     """ given dataset ds, find frequent k-patterns with min support min_sup """
-    log.debug('called')
+    log.info('called')
     counts = dict()
     for row in ds:
         rowCounts = countItems(row)
@@ -331,6 +331,7 @@ def mineFPTree(fptree,k,min_sup):
     return patterns
 
 def fpGrowthPatterns(ds,k,min_sup=0):
+    log.info('called')
     log.debug('called on ds with {0} elements'.format(len(ds)))
     
     log.debug('building FP-Tree')
@@ -339,7 +340,7 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 
     log.debug('running FP-Growth on FP-Tree')
     patterns = mineFPTree(fptree,k,min_sup)
-    log.info('FP-Growth found {0} patterns'.format(len(patterns)))
+    log.info('found {0} k={1} patterns'.format(len(patterns),k))
 
     return patterns
 
@@ -362,7 +363,7 @@ def fpGrowthPatterns(ds,k,min_sup=0):
 ######################################################################
 
 def eclatPatterns(vds,k,min_sup=0):
-    log.debug('called')
+    log.info('called')
     if not hasattr(vds,'__IS_VERTICAL__'):
         ds = vds
         vds = VerticalDataset()
@@ -376,7 +377,7 @@ def eclatPatterns(vds,k,min_sup=0):
                            sets)
         if len(items) >= min_sup:
             patterns.append(list(tup))
-    log.info('found {0} frequent patterns'.format(len(patterns)))
+    log.info('found {0} k={1} patterns'.format(len(patterns),k))
     return patterns
 
 ######################################################################
@@ -404,32 +405,16 @@ if __name__ == '__main__':
 
     log.info("Read {0} lines in {1}".format(len(ds),filename))
 
-    patterns = aprioriPatterns(ds,k,len(ds)/2)
-    
-    print 'found {0} patterns of size {1}'.format(len(patterns),k)
-    if max_results == -1:
-        max_results = len(patterns)
-    for i in range(min(len(patterns),max_results)):
-        print patterns[i]
+    fp_miners = ({'apriori':aprioriPatterns,
+                  'fpgrowth':fpGrowthPatterns,
+                  'eclat':eclatPatterns})
 
-    max_results = -1
-    if len(sys.argv) > 3:
-        max_results = int(sys.argv[3])
-        
-    patterns = fpGrowthPatterns(ds,k,len(ds)/2)
-    
-    print 'found {0} patterns of size {1}'.format(len(patterns),k)
-    if max_results == -1:
-        max_results = len(patterns)
-    for i in range(min(len(patterns),max_results)):
-        print patterns[i]
-        
-    vds = VerticalDataset()
-    vds.readFromDataset(ds)
-    patterns = eclatPatterns(vds,k,len(ds)/2)
-    
-    print 'found {0} patterns of size {1}'.format(len(patterns),k)
-    if max_results == -1:
-        max_results = len(patterns)
-    for i in range(min(len(patterns),max_results)):
-        print patterns[i]
+    for key in fp_miners.keys():
+        patterns = fp_miners[key](ds,k,len(ds)/2)
+        if max_results == -1:
+            max_results = len(patterns)
+        for i in range(min(len(patterns),max_results)):
+            print patterns[i]
+        max_results = -1
+        if len(sys.argv) > 3:
+            max_results = int(sys.argv[3])
