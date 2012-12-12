@@ -273,6 +273,8 @@ def buildFPTree(ds,min_sup):
     return fptree
 
 def combsOfSize(l,k):
+    if k > len(l):
+        return []
     return [list(val) for val in combinations(l,k)]
 
 def mineFPTree(fptree,k,min_sup):
