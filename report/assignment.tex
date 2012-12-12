@@ -38,7 +38,7 @@ Given a large dataset of transactions each containing several items,
 find sets of a given cardinality containing items which occur together
 frequently.  Frequently being that the number of transactions in which
 the items occur together (their ``support'') is more than some
-minimum.
+minimum\cite{Han2007,fpmlecture}.
 
 \subsection{Motivation}
 
@@ -51,8 +51,8 @@ optimization.
 \section{Algorithms}
 
 I implemented the following algorithms for mining frequent patterns:
-\texttt{Apriori}, \texttt{FP-growth}, and \texttt{Eclat}
-\cite{Han2007,fpmlecture}.
+\texttt{Apriori}\cite{Agrawal94}, \texttt{FP-growth}\cite{Han04}, and
+\texttt{Eclat}\cite{Zaki97}.
 
 \subsection{Apriori}
 
