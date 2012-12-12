@@ -11,6 +11,7 @@
 \usepackage{HeaderStuff}
 \usepackage{url}
 \usepackage{hyperref}
+\usepackage{nonfloat}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Multicolumn stuff
@@ -50,28 +51,76 @@ I implemented the following algorithms for mining frequent patterns:
 
 \subsection{Apriori}
 
-In which we describe the Apriori algorithm.
+This algorithm is based on the antimonotone property of frequent
+itemsets.  That is to say, subsets of frequent itemsets must
+themselves be frequent itemsets.  With this in mind, to find frequent
+itemsets of size k, we begin by finding all frequent itemsets of size
+1, which simply means to count the occurences (called the support) of
+each item in the dataset.  For efficiency, we may also set a minimum
+support above which we consider an itemset to be frequent.
+
+Knowing the frequent itemsets of size 1, we find the frequent itemsets
+of size 2 by rescanning the dataset again.  We repeat this process of
+incrementing the size of the itemsets and filtering out infrequent
+patterns until we reach the desired patterns of size k.
 
 \subsection{FP-Growth}
 
-In which we describe the FP-Growth algorithm.
+First we build a structure of information about frequent items called
+the \emph{FP-Tree}.  This tree stores nodes representing items in the
+dataset and the number of times the prefix formed by the path from the
+root to the node appears in itemsets in the dataset.
+
+\begin{center}
+\includegraphics[scale=0.5]{../figs/tiny.png}
+\figcaption{The FP-Tree of the full \texttt{tiny.dat} dataset}
+\end{center}
+
+Not shown above is a table stored along with the \emph{FP-Tree} which
+stores the support of each item in the tree along with a list of nodes
+for each item in the tree.
+
+Next, we mine the tree.  If the \emph{FP-Tree} consists of a single
+path, then all combinations of frequent items along the path are
+frequent patterns.  If the \emph{FP-Tree} has many paths, we go
+through each item and build conditional \emph{FP-Trees} of
+transactions containing that item, and recursively mining those trees.
 
 \subsection{Eclat}
 
-In which we describe the Eclat algorithm.
+This algorithm is based around the properties of the vertical data
+format, in which each item has an associated transaction id set
+(tidset).  The support of an individual item is simply the cardinality
+of its tidset.  The support of more than one item is simply the
+cardinality of the intersection of the tidsets of the items.
 
-\section{Challenges}
-
-In which we describe the challenges encountered.
+To find all the k-patterns on a dataset, Eclat simply iterates over
+all k-combinations of items and for each it checks the cardinality of
+the intersection of the items in the combination.  If the cardinality
+is at least the minimum support, it reports the pattern.
 
 \section{Testing Methodology}
 
 In which we describe the methodology of the testing.
 
+\begin{center}
+\begin{figure*}
+\includegraphics[scale=0.9]{../figs/runtimes_by_k.png}
+\caption{Algorithm Runtimes by k}
+\end{figure*}
+\end{center}
+
 \section{Results}
 \label{sec:results}
 
 In which we describe the results of the experiments.
+
+\begin{center}
+\begin{figure*}
+\includegraphics[scale=0.9]{../figs/runtimes_by_rows.png}
+\caption{Algorithm Runtimes by Size of Dataset}
+\end{figure*}
+\end{center}
 
 \section{Future Work}
 
