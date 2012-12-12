@@ -35,6 +35,8 @@
 
 The problem domain is to find frequent patterns in large data sets.
 
+NEEDS WORK
+
 \subsection{Motivation}
 
 Frequent patterns in data can give us insight into the semantic
@@ -101,19 +103,27 @@ is at least the minimum support, it reports the pattern.
 
 \section{Testing Methodology}
 
-In which we describe the methodology of the testing.
-
-\begin{center}
-\begin{figure*}
-\includegraphics[scale=0.9]{../figs/runtimes_by_k.png}
-\caption{Algorithm Runtimes by k}
-\end{figure*}
-\end{center}
+The various algorithms were tested by measuring the time to find
+frequent patterns, varying the independent variables including: the
+size of the dataset, the minimum support, and the length of the
+desired patterns (k).
 
 \section{Results}
 \label{sec:results}
 
-In which we describe the results of the experiments.
+\begin{center}
+\begin{figure*}
+\includegraphics[scale=0.9]{../figs/runtimes_by_min_sup.png}
+\caption{Algorithm Runtimes by Minimum Support}
+\end{figure*}
+\end{center}
+
+\begin{center}
+\begin{figure*}
+\includegraphics[scale=0.9]{../figs/runtimes_by_k.png}
+\caption{Algorithm Runtimes by Length of Pattern (k)}
+\end{figure*}
+\end{center}
 
 \begin{center}
 \begin{figure*}
@@ -121,6 +131,19 @@ In which we describe the results of the experiments.
 \caption{Algorithm Runtimes by Size of Dataset}
 \end{figure*}
 \end{center}
+
+The data show that algorithm runtime gets lower as minimum support gets
+higher, gets higher as the length of the patterns increase, and gets
+higher as the size of the dataset gets bigger.
+
+More importantly, the \texttt{Eclat} algorithm outperforms
+\texttt{Apriori} and \texttt{FP-Growth} when varying dataset size or
+minimum support, and remains competitive with \texttt{FP-Growth} for
+high values of k, though \texttt{FP-Growth} is best for small
+patterns.
+
+Overall, \texttt{Eclat} is the best of the algorithms I've
+implemented.
 
 \section{Future Work}
 
