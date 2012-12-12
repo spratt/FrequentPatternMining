@@ -272,18 +272,31 @@ def buildFPTree(ds,min_sup):
     log.debug('FP-Tree is a single path? {0}'.format(fptree.isSinglePath()))
     return fptree
 
+def combsOfSize(l,k):
+    return [list(val) for val in combinations(l,k)]
+
 def mineFPTree(fptree,k,min_sup):
     log.debug('called')
+    patterns = []
 
     # base case: fptree has a single path
     if fptree.isSinglePath():
         log.debug('fptree has one path')
         counts = fptree.itemCounts
-        candidateItems = filter(lambda x: counts[x] >= min_sup,\
+        candidatePatterns = filter(lambda x: counts[x] >= min_sup,\
                                        counts.keys())
         log.debug('{0} items have at least min_sup'.\
-                     format(len(candidateItems)))
-        return map(list,combinations(candidateItems,k))
+                     format(len(candidatePatterns)))
+        candidatePatterns = combsOfSize(candidatePatterns,k)
+        log.debug('generated {0} candidate patterns'.\
+                     format(len(candidatePatterns)))
+        for cand in candidatePatterns:
+            if len(cand) < k:
+                continue
+            patterns.append(cand)
+        log.debug('filtered candidates down to {0} patterns'.\
+                     format(len(patterns)))
+        return patterns
 
     log.debug('fptree has many paths')
     log.debug('building item list sorted by frequency ascending')
@@ -296,8 +309,7 @@ def mineFPTree(fptree,k,min_sup):
 
     if k == 1:
         return map(lambda x: [x],items)
-
-    patterns = []
+    
     for item in items:
         cpb = fptree.getConditionalPatternBase(item)
         log.debug('conditional pattern base for {0} has {1} rows'.\
@@ -309,8 +321,8 @@ def mineFPTree(fptree,k,min_sup):
 
         cfp = mineFPTree(cfpt,k-1,min_sup)
         log.debug('mined FP-Tree')
-        ipatterns = map(lambda x: x + [item],cfp)
-        for pattern in ipatterns:
+        for fp in cfp:
+            pattern = fp + [item]
             if pattern not in patterns:
                 patterns.append(pattern)
         log.debug('generated {0} new patterns ending in {1}'.\
