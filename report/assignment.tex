@@ -33,9 +33,12 @@
 
 \section{The Problem}
 
-The problem domain is to find frequent patterns in large data sets.
-
-NEEDS WORK
+The problem herein considered is that of Frequent Pattern Mining.
+Given a large dataset of transactions each containing several items,
+find sets of a given cardinality containing items which occur together
+frequently.  Frequently being that the number of transactions in which
+the items occur together (their ``support'') is more than some
+minimum.
 
 \subsection{Motivation}
 
@@ -101,16 +104,6 @@ all k-combinations of items and for each it checks the cardinality of
 the intersection of the items in the combination.  If the cardinality
 is at least the minimum support, it reports the pattern.
 
-\section{Testing Methodology}
-
-The various algorithms were tested by measuring the time to find
-frequent patterns, varying the independent variables including: the
-size of the dataset, the minimum support, and the length of the
-desired patterns (k).
-
-\section{Results}
-\label{sec:results}
-
 \begin{center}
 \begin{figure*}
 \includegraphics[scale=0.9]{../figs/runtimes_by_min_sup.png}
@@ -131,6 +124,16 @@ desired patterns (k).
 \caption{Algorithm Runtimes by Size of Dataset}
 \end{figure*}
 \end{center}
+
+\section{Testing Methodology}
+
+The various algorithms were tested by measuring the time to find
+frequent patterns, varying the independent variables including: the
+size of the dataset, the minimum support, and the length of the
+desired patterns (k).
+
+\section{Results}
+\label{sec:results}
 
 The data show that algorithm runtime gets lower as minimum support gets
 higher, gets higher as the length of the patterns increase, and gets
